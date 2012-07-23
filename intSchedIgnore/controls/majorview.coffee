@@ -6,19 +6,29 @@ objToView = (obj) ->
             title: obj
             numNeeded: 1
     else
-        BinView.create
-            watchList: ((o.title || o).replace ' ', '_' for o in obj.list)
+        BinView.create().json
             numNeeded: obj.num
             obj: obj
             title: obj.title
             binList:
                 control: List
                 items: objToView o for o in obj.list
+            watchList: ((o.title || o).replace ' ', '_' for o in obj.list)
 
-class MajorView extends Completable
-    _obj: Control.property
+I.objToView = objToView
 
-    name: Control.property
+class MajorView extends BinView
+    _obj: Control.property (obj) ->
+        @content objToView obj.bin
+
+    name: Control.property (name) ->
+        # Should check if the new name is different from the old one.
+        # Consider adding Liron's sideEffectFn patch
+        @_obj I.collections.majors.findOne 'name': name
 
     initialize: ->
-        @_obj I.collections.majors.find('name': name).fetch()
+        if not @_obj() and @name()
+            @_obj I.collections.majors.find('name': @name()).fetch()
+            @content objToView @_obj().bin
+
+I.controls.MajorView = MajorView
