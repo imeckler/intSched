@@ -10,7 +10,7 @@ class QuarterView extends Control
             'height': '150px'
             'border-right': '2px solid black'
             'border-top': '2px solid black'
-            'background-color': 'gray'
+            'background-color': 'white'
 
     season: Control.property()
 

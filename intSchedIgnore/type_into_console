@@ -12,4 +12,10 @@ Try this shit too:
 su = ScheduleUI.create()
 $('body').append(su)
 su.$majorView().name('CMSC')
-su.$majorView().name('MATH_BA')
+su.$listComboBox().items(map(function(x){return x.name}, I.collections.majors.find().fetch()))
+
+intro = $(su.$majorView().control().content().control().binList().items()[0]).control()
+intro1 = $(intro.binList().items()[0]).control()
+intro2 = $(intro.binList().items()[1]).control()
+systems = $(intro.binList().items()[2]).control()
+theory = $(intro.binList().items()[3]).control()

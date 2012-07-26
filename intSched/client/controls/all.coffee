@@ -1,30 +1,29 @@
 I.controls = {}
 
 class Completable extends Control
-    numNeeded: Control.property()
+    numNeeded: Control.property!
 
-    title: Control.property()
+    title: Control.property!
 
     # The list of events to watch for. Should only be set on creation
     watchList: Control.property (watchList) ->
-        @off()
-        (@on e, (ev) => @_numComplete(@_numComplete() + 1)) for e in @watchList()
+        @off!
+        (@on e, (ev) => @_numComplete(@_numComplete! + 1)) for e in @watchList!
 
     complete: Control.property.bool(
         (complete) ->
             if complete
-                @trigger @title().replace ' ', '_',
+                @trigger @title!.replace ' ', '_',
         false)
 
     _numComplete: Control.property(
-        (numComplete) -> if numComplete == @numNeeded() then @complete(true),
+        (numComplete) -> if numComplete == @numNeeded! then @complete(true),
         0)
 
     initialize: ->
-        if not @watchList()
-            return
-        @off()
-        (@on e, (ev) => @_numComplete(@_numComplete() + 1)) for e in @watchList()
+        if not @watchList! then return
+        @off!
+        (@on e, (ev) => @_numComplete(@_numComplete! + 1)) for e in @watchList!
 
 I.controls.Completable = Completable
 
@@ -36,23 +35,25 @@ class BinView extends Completable
 
     ## Until I figure out how to add a sideEffectFunction properly
     complete: (complete) ->
+        console.log 'wtf'
         if complete is undefined
-            return @_super()
+            return @_super!
         else
             @_super complete
             if complete
+                console.log 'wtf'
                 @css
-                    "background-color": "green"
+                    "background-color": "#93FF93"
             else
                 @css
                     "background-color": "white"
 
-    number: Control.property()
+    number: Control.property!
 
     binList: Control.property (binList) ->
-        @$collapsible().content binList
+        @$collapsible!.content binList
 
-    obj: Control.property()
+    obj: Control.property!
 
     title: Control.chain '$collapsible', 'heading'
 
@@ -72,17 +73,17 @@ I.CourseView = CourseView
 
 objToView = (obj) ->
     if typeof obj == 'string'
-        CourseView.create().json
+        CourseView.create!.json
             title: obj
             numNeeded: 1
     else
-        BinView.create().json
+        BinView.create!.json
             numNeeded: obj.num
             obj: obj
             title: obj.title
             binList:
                 control: List
-                items: objToView o for o in obj.list
+                items: map objToView, obj.list
             watchList: ((o.title || o).replace ' ', '_' for o in obj.list)
 
 I.objToView = objToView
@@ -97,9 +98,9 @@ class MajorView extends BinView
         @_obj I.collections.majors.findOne 'name': name
 
     initialize: ->
-        if not @_obj() and @name()
-            @_obj I.collections.majors.find('name': @name()).fetch()
-            @content objToView @_obj().bin
+        if not @_obj! and @name!
+            @_obj I.collections.majors.find('name': @name!).fetch!
+            @content objToView @_obj!.bin
 
 I.controls.MajorView = MajorView
 
@@ -119,7 +120,7 @@ class QuarterView extends Control
             'border-top': '2px solid black'
             'background-color': 'white'
 
-    season: Control.property()
+    season: Control.property!
 
     initialize: ->
         @droppable
@@ -132,8 +133,8 @@ class QuarterView extends Control
                     'background-color': 'gray'
 
             drop: (event, ui) =>
-                newCourse = ui.helper.control()
-                @courseViews().insertItemBefore newCourse, 0
+                newCourse = ui.helper.control!
+                @courseViews!.insertItemBefore newCourse, 0
 
     tag: 'td'
 
@@ -146,7 +147,7 @@ class YearView extends Control
             mapFunction: 'season'
             items: ["Autumn", "Winter", "Spring", "Summer"]
 
-    name: Control.property()
+    name: Control.property!
 
     tag: 'tr'
 
@@ -168,10 +169,9 @@ class ScheduleView extends Control
             'font-family': 'Helvetica, Arial, sans'
 
     # This will correspond to a meteor cursor or something similar
-    years: Control.property()
+    years: Control.property!
 
     tag: 'table'
-
 
 class ScheduleUI extends Control
     inherited:
@@ -181,10 +181,36 @@ class ScheduleUI extends Control
                 control: ScheduleView
                 ref: 'scheduleView'
             right:
-                control: MajorView
-                ref: 'majorView'
-
+                html: 'div'
+                content: [
+                    {
+                        control: ListComboBox
+                        ref: 'listComboBox'
+                        css:
+                            'width': 'inherit'
+                    }
+                    {
+                        control: MajorView
+                        ref: 'majorView'
+                    }
+                ]
+                css:
+                    'width': '300px'
         css:
             'width': '900px'
             'height': '700px'
+
+    initialize: ->
+        @majorList!.on
+            selectionChanged: =>
+                selectedControl = @majorList!.selectedControl!
+                if selectedControl
+                    content = selectedControl.content!
+                    if content is not @content!
+                        @content content
+                        @_selectText 0, content.length
+
+                @$majorView!.name content
+
+    majorList: Control.chain '$listComboBox', '$list'
 

@@ -6,6 +6,6 @@ class CourseView extends Completable
             revert: 'invalid'
             appendTo: 'body'
 
-    title: Control.chain('content')
+    title: Control.chain 'content'
 
 I.CourseView = CourseView
