@@ -58,11 +58,17 @@ class BinView extends Completable
 I.controls.BinView = BinView
 
 class CourseView extends Completable
+    inherited:
+        css:
+            'cursor': 'pointer'
+
     title: Control.chain 'content'
 
     _courseObj: Control.property!
 
     currentOwner: Control.property!
+
+    termsOffered: Control.property!
 
     initialize: ->
         @draggable
@@ -88,6 +94,8 @@ class CourseHolder extends Control
 
     title: Control.chain '$courseView', 'title'
 
+    termsOffered: Control.chain '$courseView', 'termsOffered'
+
     info: Control.chain '$infoButton', 'popup'
 
     numNeeded: Control.chain '$courseView', 'numNeeded'
@@ -96,9 +104,11 @@ I.CourseView = CourseView
 
 objToView = (obj) ->
     if typeof obj == 'string'
+        course = I.collections.courses.findOne 'code': obj
         CourseHolder.create!.json
             title: obj
-            info: (I.collections.courses.findOne 'code': obj).desc
+            info: course.desc
+            termsOffered: course.terms_offered
             numNeeded: 1
     else
         BinView.create!.json
@@ -144,15 +154,22 @@ class QuarterView extends Control
             'border-top': '2px solid black'
             'background-color': 'white'
 
+    _shouldAccept: Control.property.bool!
+
     season: Control.property!
 
     initialize: ->
         @droppable
-            accept: ".CourseView"
+            accept: (draggable) =>
+                course = draggable.control!
+                if -1 isnt course.termsOffered!.indexOf @season!
+                    @_shouldAccept true
 
             activate: (event, ui) =>
-                @animate
-                    'background-color': '#93FF93'
+                course = ui.draggable.control!
+                if @_shouldAccept!
+                    @animate
+                        'background-color': '#93FF93'
 
             deactivate: =>
                 @animate
