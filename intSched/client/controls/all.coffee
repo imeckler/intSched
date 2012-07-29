@@ -35,13 +35,11 @@ class BinView extends Completable
 
     ## Until I figure out how to add a sideEffectFunction properly
     complete: (complete) ->
-        console.log 'wtf'
         if complete is undefined
             return @_super!
         else
             @_super complete
             if complete
-                console.log 'wtf'
                 @css
                     "background-color": "#93FF93"
             else
@@ -60,21 +58,47 @@ class BinView extends Completable
 I.controls.BinView = BinView
 
 class CourseView extends Completable
-    inherited:
-        draggable:
-            start: (event, ui) ->
-                console.log "poopies drag"
+    title: Control.chain 'content'
+
+    _courseObj: Control.property!
+
+    currentOwner: Control.property!
+
+    initialize: ->
+        @draggable
+            start: (event, ui) =>
+                if not @_courseObj!
+                    @_courseObj I.collections.courses.findOne 'code': @title! 
             revert: 'invalid'
+            helper: 'clone'
             appendTo: 'body'
 
-    title: Control.chain 'content'
+class CourseHolder extends Control
+    inherited:
+        content: [
+            {
+                control: CourseView
+                ref: 'courseView'
+            }
+            {
+                control: PopupButton
+                ref: 'infoButton'
+            }
+        ]
+
+    title: Control.chain '$courseView', 'title'
+
+    info: Control.chain '$infoButton', 'popup'
+
+    numNeeded: Control.chain '$courseView', 'numNeeded'
 
 I.CourseView = CourseView
 
 objToView = (obj) ->
     if typeof obj == 'string'
-        CourseView.create!.json
+        CourseHolder.create!.json
             title: obj
+            info: (I.collections.courses.findOne 'code': obj).desc
             numNeeded: 1
     else
         BinView.create!.json
@@ -126,15 +150,19 @@ class QuarterView extends Control
         @droppable
             accept: ".CourseView"
 
-            activate: ->
+            activate: (event, ui) =>
+                @animate
+                    'background-color': '#93FF93'
 
             deactivate: =>
-                @css
-                    'background-color': 'gray'
+                @animate
+                    'background-color': 'white'
 
             drop: (event, ui) =>
-                newCourse = ui.helper.control!
-                @courseViews!.insertItemBefore newCourse, 0
+                newCourse = ui.draggable.control!
+                # if newcourse is valid...
+                newCourse.complete true
+                @$courseViews!.insertItemBefore newCourse, 0
 
     tag: 'td'
 
@@ -213,4 +241,3 @@ class ScheduleUI extends Control
                 @$majorView!.name content
 
     majorList: Control.chain '$listComboBox', '$list'
-

@@ -2,4 +2,4 @@ Meteor.publish "majors", ->
     I.collections.majors.find {}
 
 Meteor.publish "courses", ->
-    I.collections.majors.find {}
+    I.collections.courses.find {}
