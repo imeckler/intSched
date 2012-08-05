@@ -144,7 +144,6 @@ class QuarterView extends Control
     inherited:
         content:
             control: List
-            itemClass: CourseView
             ref: "courseViews"
 
         css:
@@ -157,6 +156,9 @@ class QuarterView extends Control
     _shouldAccept: Control.property.bool!
 
     season: Control.property!
+
+    # Find out why .title! isn't working here. .text! is a hack.
+    object: -> $(c).control!.title! for c in @$courseViews!.controls!
 
     initialize: ->
         @droppable
@@ -185,9 +187,13 @@ class QuarterView extends Control
 
 
 class YearView extends Control
+    object: ->
+        $(q).control!.object! for q in @$quarterViews!.controls!
+
     inherited:
         content:
             control: List
+            ref: 'quarterViews'
             itemClass: QuarterView
             mapFunction: 'season'
             items: ["Autumn", "Winter", "Spring", "Summer"]
@@ -198,11 +204,14 @@ class YearView extends Control
 
 
 class ScheduleView extends Control
+    object: ->
+        $(y).control!.object! for y in @$yearViews!.controls!
+
     inherited:
         content:
             control: List
             itemClass: YearView
-            ref: 'yearViewList'
+            ref: 'yearViews'
             mapFunction:
                 name: 'name'
             items: ["1", "2", "3", "4"]
