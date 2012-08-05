@@ -1,0 +1,65 @@
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.quarter {
+  /*border: 3px solid black;*/
+  background-color: #EEE;
+  border-radius: 10px;
+  height: 150px;
+  width: 150px;
+  display: inline-block;
+}
+
+.seasonlabel {
+  display: inline-block;
+  width: 150px;
+}
+
+.majorbin {
+  margin-top: 20px;
+}
+
+.scheduleui {
+  /*width: 1000px;*/
+}
+
+.schedule {
+  /*border-spacing: 5px;*/
+}
+
+.true_bin {
+  /*border: 1px solid lightgray;*/
+  margin-bottom: 10px;
+}
+
+.true_bin .heading {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  background: #f0f0f0;
+  font-weight: bold;
+  padding: 0.5em 0.5em 0.5em 1em;
+  cursor: pointer;
+}
+
+.true_bin .heading:hover{
+  background: #CCC;
+}
+
+.true_bin .content {
+  overflow: auto;
+  padding: 1em;
+  border-left-style: solid;
+  border-left-color: #EEE;
+  border-right-style: solid;
+  border-right-color: #EEE;
+  border-bottom-style: solid;
+  border-bottom-color: #EEE;
+
+}
+
+
+.singleton_bin {
+  font-size: 10pt;
+  cursor: pointer;
+}

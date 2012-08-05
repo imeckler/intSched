@@ -1,0 +1,88 @@
+<head>
+  <title>lintSched</title>
+</head>
+
+<body>
+  <div class="navbar">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="#">IntSched</a>
+      </div>
+    </div>
+  </div>
+  {{> scheduleui}}
+</body>
+
+<template name="scheduleui">
+  <div class="scheduleui container-fluid">
+    {{> schedule}}
+    <div class="sidebar">
+      <input type="text" data-provide="typeahead" class="majorinput"></input>
+      {{> majorbin}}
+    </div>
+  </div>
+</template>
+
+<template name="schedule">
+  <div class="schedule span8" cellspacing="10">
+    <div>
+      <div class="seasons">
+        <h3 class="seasonlabel" align="center">Autumn</h3>
+        <h3 class="seasonlabel" align="center">Winter</h3>
+        <h3 class="seasonlabel" align="center">Spring</h3>
+        <h3 class="seasonlabel" align="center">Summer</h3>
+      </div>
+      {{#each years}}
+        {{> year}}
+      {{/each}}
+    </div>
+  </div>
+</template>
+
+<template name="year">
+  <div class="year">
+    {{#each quarters}}
+      {{> quarter}}
+    {{/each}}
+  </div>
+</template>
+
+<template name="quarter">
+  <div class="quarter" season="{{season}}">
+    <div class="courselist">
+      {{#each courses}}
+        {{course}}
+      {{/each}}
+    </div>
+  </div>
+</template>
+
+<template name="bin">
+  {{#if bins}}
+    <div class="true_bin">
+      <div class="heading">
+        {{title}}
+      </div>
+      <div class="content">
+        {{#each bins}}
+          {{> bin}}
+        {{/each}}
+      </div>
+    </div>
+  {{else}}
+    <div class="singleton_bin">
+      {{this}}
+    </div>
+  {{/if}}
+</template>
+
+<template name="majorbin">
+  <div class="majorbin span5">
+    {{#with selected_major.bin}}
+      {{> bin}}
+    {{/with}}
+  </div>
+</template>
+
+<template name="course">
+</template>
